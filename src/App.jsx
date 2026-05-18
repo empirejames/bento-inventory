@@ -31,7 +31,8 @@ function App() {
       req[key] = {
         ...INGREDIENTS[key],
         amount: 0,
-        cost: 0
+        cost: 0,
+        prepAmount: 0
       };
     });
 
@@ -46,6 +47,19 @@ function App() {
             totalCost += sold * qty * req[ingKey].costPerUnit;
           }
         });
+      }
+    });
+
+    // Calculate prep amounts
+    Object.values(req).forEach(item => {
+      if (item.amount > 0) {
+        if (item.prepStrategy === 'ceil') {
+          item.prepAmount = Math.ceil(item.amount);
+        } else if (item.prepStrategy === 'half') {
+          item.prepAmount = Math.ceil(item.amount * 2) / 2;
+        } else {
+          item.prepAmount = item.amount;
+        }
       }
     });
 
@@ -87,8 +101,15 @@ function App() {
                 <span className="summary-name">{item.name}</span>
                 <span className="badge">{item.unit}</span>
               </div>
-              <div className="summary-val">
-                {item.amount % 1 !== 0 ? item.amount.toFixed(2) : item.amount} {item.unit}
+              <div style={{ textAlign: 'right' }}>
+                <div className="summary-val" style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
+                  實際消耗: {item.amount % 1 !== 0 ? item.amount.toFixed(2) : item.amount} {item.unit}
+                </div>
+                {item.prepStrategy && item.prepStrategy !== 'none' && (
+                  <div style={{ color: 'var(--accent-color)', fontSize: '1.1rem', marginTop: '0.25rem', fontWeight: 600 }}>
+                    👉 建議備料: {item.prepAmount} {item.unit}
+                  </div>
+                )}
               </div>
             </li>
           ))}
