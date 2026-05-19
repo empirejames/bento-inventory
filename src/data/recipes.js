@@ -1,7 +1,7 @@
 export const INGREDIENTS = {
   chicken: { id: 'chicken', name: '嫩雞肉', unit: '盆', costPerUnit: 2200, perBento: 1/64, prepStrategy: 'ceil' },
-  rice: { id: 'rice', name: '白飯', unit: '鍋', costPerUnit: 200, perBento: 1/60, prepStrategy: 'ceil' },
-  cabbage: { id: 'cabbage', name: '百吉藍白菜', unit: '籃', costPerUnit: 220, perBento: 1/55, prepStrategy: 'half' },
+  rice: { id: 'rice', name: '白米', unit: '袋', costPerUnit: 800, perBento: 1/240, prepStrategy: 'ceil' },
+  cabbage: { id: 'cabbage', name: '大白菜', unit: '大籃', costPerUnit: 990, perBento: 1/275, prepStrategy: 'none' },
   tofu: { id: 'tofu', name: '油豆腐', unit: '包', costPerUnit: 230, perBento: 1/80, prepStrategy: 'ceil' },
   egg: { id: 'egg', name: '荷包蛋', unit: '籃', costPerUnit: 800, perBento: 1/180, prepStrategy: 'ceil' },
   chickenOil: { id: 'chickenOil', name: '雞油醬', unit: '包', costPerUnit: 180, perBento: 1/128, prepStrategy: 'ceil' },
@@ -16,8 +16,8 @@ export const BENTO_TYPES = [
     price: 120, // 預設售價
     ingredients: {
       chicken: 1/64,
-      rice: 1/60,
-      cabbage: 1/55,
+      rice: 1/240,
+      cabbage: 1/275,
       tofu: 1/80,
       egg: 1/180,
       chickenOil: 1/128,
