@@ -6,6 +6,15 @@ function App() {
   const [sales, setSales] = useState({
     signature_chicken: 0
   });
+  const [stock, setStock] = useState({});
+
+  const handleStockSet = (id, value) => {
+    const val = parseFloat(value);
+    setStock(prev => ({
+      ...prev,
+      [id]: isNaN(val) ? 0 : Math.max(0, val)
+    }));
+  };
 
   const handleUpdate = (id, delta) => {
     setSales(prev => ({
@@ -50,15 +59,27 @@ function App() {
       }
     });
 
-    // Calculate prep amounts
+    // Calculate prep and order amounts
     Object.values(req).forEach(item => {
       if (item.amount > 0) {
+        // Calculate Prep
         if (item.prepStrategy === 'ceil') {
           item.prepAmount = Math.ceil(item.amount);
         } else if (item.prepStrategy === 'half') {
           item.prepAmount = Math.ceil(item.amount * 2) / 2;
         } else {
           item.prepAmount = item.amount;
+        }
+
+        // Calculate Order
+        const currentStock = stock[item.id] || 0;
+        const rawOrder = Math.max(0, item.amount - currentStock);
+        if (item.prepStrategy === 'ceil') {
+          item.orderAmount = Math.ceil(rawOrder);
+        } else if (item.prepStrategy === 'half') {
+          item.orderAmount = Math.ceil(rawOrder * 2) / 2;
+        } else {
+          item.orderAmount = Number(rawOrder.toFixed(2));
         }
       }
     });
@@ -101,15 +122,29 @@ function App() {
                 <span className="summary-name">{item.name}</span>
                 <span className="badge">{item.unit}</span>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <div className="summary-val" style={{ fontSize: '0.95rem', color: 'var(--text-secondary)' }}>
-                  實際消耗: {item.amount % 1 !== 0 ? item.amount.toFixed(2) : item.amount} {item.unit}
+              <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                <div className="summary-val" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
+                  預估消耗: {item.amount % 1 !== 0 ? item.amount.toFixed(2) : item.amount} {item.unit}
                 </div>
                 {item.prepStrategy && item.prepStrategy !== 'none' && (
-                  <div style={{ color: 'var(--accent-color)', fontSize: '1.1rem', marginTop: '0.25rem', fontWeight: 600 }}>
-                    👉 建議備料: {item.prepAmount} {item.unit}
+                  <div style={{ color: 'var(--accent-color)', fontSize: '0.95rem', marginTop: '0.2rem', fontWeight: 600 }}>
+                    建議備料: {item.prepAmount} {item.unit}
                   </div>
                 )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.8rem' }}>
+                  <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>盤點剩下:</span>
+                  <input 
+                    type="number" 
+                    step="0.1"
+                    value={stock[item.id] || ''}
+                    onChange={(e) => handleStockSet(item.id, e.target.value)}
+                    placeholder="0"
+                    style={{ width: '60px', padding: '0.3rem', fontSize: '0.9rem', textAlign: 'center' }}
+                  />
+                </div>
+                <div style={{ color: '#fbbf24', fontSize: '1.1rem', marginTop: '0.5rem', fontWeight: 700, padding: '0.3rem 0.6rem', background: 'rgba(251, 191, 36, 0.1)', borderRadius: '6px' }}>
+                  🛒 實際叫貨: {item.orderAmount} {item.unit}
+                </div>
               </div>
             </li>
           ))}
